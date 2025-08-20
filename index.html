@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome to Invoizer</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f8faff 0%, #e6eeff 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden;
+            padding: 20px;
+        }
+        
+        .container {
+            text-align: center;
+            position: relative;
+            z-index: 10;
+            max-width: 800px;
+            width: 100%;
+        }
+        
+        .logo-container {
+            margin-bottom: 40px;
+            position: relative;
+        }
+        
+        .logo {
+            width: 140px;
+            height: 140px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+        
+        .logo-icon {
+            font-size: 60px;
+            color: #2563eb;
+            background: white;
+            width: 100px;
+            height: 100px;
+            border-radius: 24px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 15px 35px rgba(37, 99, 235, 0.2);
+            transform: rotate(-5deg);
+            transition: all 0.4s ease;
+        }
+        
+        .logo:hover .logo-icon {
+            transform: rotate(0deg) scale(1.05);
+            box-shadow: 0 20px 40px rgba(37, 99, 235, 0.3);
+        }
+        
+        .logo-text {
+            font-size: 52px;
+            font-weight: 800;
+            background: linear-gradient(to right, #2563eb, #1e40af);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-top: 15px;
+            letter-spacing: 1px;
+            position: relative;
+        }
+        
+        .logo-text::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 4px;
+            background: #2563eb;
+            border-radius: 2px;
+        }
+        
+        h1 {
+            color: #1e293b;
+            font-size: 2.8rem;
+            margin-bottom: 20px;
+            font-weight: 700;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeInUp 0.8s 0.3s forwards;
+        }
+        
+        .tagline {
+            color: #2563eb;
+            font-size: 1.4rem;
+            font-weight: 500;
+            margin-bottom: 30px;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeInUp 0.8s 0.5s forwards;
+        }
+        
+        p {
+            color: #64748b;
+            font-size: 1.1rem;
+            max-width: 600px;
+            margin: 0 auto 40px;
+            line-height: 1.6;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeInUp 0.8s 0.7s forwards;
+        }
+        
+        .features {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-bottom: 40px;
+            flex-wrap: wrap;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeInUp 0.8s 0.9s forwards;
+        }
+        
+        .feature {
+            background: white;
+            padding: 20px;
+            border-radius: 16px;
+            width: 160px;
+            box-shadow: 0 10px 25px rgba(37, 99, 235, 0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .feature:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(37, 99, 235, 0.15);
+        }
+        
+        .feature i {
+            font-size: 32px;
+            color: #2563eb;
+            margin-bottom: 15px;
+        }
+        
+        .feature h3 {
+            font-size: 16px;
+            color: #1e293b;
+            font-weight: 600;
+        }
+        
+        .loading-container {
+            max-width: 500px;
+            margin: 0 auto;
+            opacity: 0;
+            animation: fadeIn 0.8s 1.1s forwards;
+        }
+        
+        .loading-text {
+            color: #64748b;
+            margin-bottom: 12px;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .loading-bar {
+            height: 6px;
+            background: #e2e8f0;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+        
+        .loading-progress {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(to right, #2563eb, #3b82f6);
+            border-radius: 3px;
+            transition: width 0.8s ease;
+        }
+        
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            pointer-events: none;
+        }
+        
+        .particle {
+            position: absolute;
+            background: #2563eb;
+            border-radius: 50%;
+            opacity: 0.3;
+            animation: float 15s infinite linear;
+        }
+        
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes fadeIn {
+            to {
+                opacity: 1;
+            }
+        }
+        
+        @keyframes float {
+            0% {
+                transform: translateY(0) rotate(0deg);
+                opacity: 0.3;
+            }
+            50% {
+                opacity: 0.2;
+            }
+            100% {
+                transform: translateY(-100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2.2rem;
+            }
+            
+            .tagline {
+                font-size: 1.2rem;
+            }
+            
+            .features {
+                gap: 15px;
+            }
+            
+            .feature {
+                width: 140px;
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="particles" id="particles-container"></div>
+    
+    <div class="container">
+        <div class="logo-container">
+            <div class="logo">
+                <div class="logo-icon">
+                    <i class="fas fa-file-invoice-dollar"></i>
+                </div>
+            </div>
+            <h1 class="logo-text">INVOIZER</h1>
+        </div>
+        
+        <h1>Simplify Your Invoicing Process</h1>
+        <div class="tagline">Professional invoices in minutes</div>
+        
+        <p>Invoizer helps you create, manage, and track invoices effortlessly. Save time and get paid faster with our intuitive invoicing platform.</p>
+        
+        <div class="features">
+            <div class="feature">
+                <i class="fas fa-bolt"></i>
+                <h3>Quick Setup</h3>
+            </div>
+            <div class="feature">
+                <i class="fas fa-shield-alt"></i>
+                <h3>Secure</h3>
+            </div>
+            <div class="feature">
+                <i class="fas fa-chart-line"></i>
+                <h3>Analytics</h3>
+            </div>
+        </div>
+        
+        <div class="loading-container">
+            <div class="loading-text">
+                <i class="fas fa-cog fa-spin"></i>
+                <span>Preparing your experience...</span>
+            </div>
+            <div class="loading-bar">
+                <div class="loading-progress" id="loading-progress"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Create particles
+        function createParticles() {
+            const container = document.getElementById('particles-container');
+            const particleCount = 30;
+            
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.classList.add('particle');
+                
+                // Random size between 5 and 30px
+                const size = Math.random() * 25 + 5;
+                particle.style.width = `${size}px`;
+                particle.style.height = `${size}px`;
+                
+                // Random position
+                particle.style.left = `${Math.random() * 100}%`;
+                particle.style.top = `${Math.random() * 100}%`;
+                
+                // Random animation duration and delay
+                const duration = Math.random() * 10 + 15;
+                const delay = Math.random() * 5;
+                particle.style.animation = `float ${duration}s ${delay}s infinite linear`;
+                
+                container.appendChild(particle);
+            }
+        }
+        
+        // Simulate loading progress
+        function simulateLoading() {
+            const progressBar = document.getElementById('loading-progress');
+            let width = 0;
+            const interval = setInterval(() => {
+                if (width >= 100) {
+                    clearInterval(interval);
+                    checkUserStatus();
+                } else {
+                    width += Math.random() * 8 + 4;
+                    if (width > 100) width = 100;
+                    progressBar.style.width = `${width}%`;
+                }
+            }, 300);
+        }
+        
+        // Check if user is logged in (has profile in local storage)
+        function checkUserStatus() {
+            // Check for any user data in local storage
+            const userData = localStorage.getItem('company');
+            
+            // Redirect based on user status
+            if (userData) {
+                window.location.href = 'home.html';
+            } else {
+                window.location.href = 'welcomeUser.html';
+            }
+        }
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            createParticles();
+            setTimeout(simulateLoading, 1500);
+        });
+    </script>
+</body>
+</html>

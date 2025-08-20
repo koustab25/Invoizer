@@ -1,0 +1,251 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- index.html -->
+
+
+  <title>AI Invoice Generator</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #4361ee;
+      --primary-light: #4895ef;
+      --secondary: #3f37c9;
+      --dark: #1a1a2e;
+      --light: #f8f9fa;
+      --success: #4cc9f0;
+      --warning: #f72585;
+      --gray: #adb5bd;
+      --gray-light: #e9ecef;
+    }
+
+    * {
+      padding: 0;
+      margin: 0;
+      box-sizing: border-box;
+      font-family: 'Inter', sans-serif;
+    }
+
+    body {
+      display: flex;
+      flex-direction: column;
+      background-color: #f8fafc;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+      background-image: 
+        radial-gradient(circle at 10% 20%, rgba(67, 97, 238, 0.05) 0%, transparent 50%),
+        radial-gradient(circle at 90% 80%, rgba(63, 55, 201, 0.05) 0%, transparent 50%);
+    }
+
+    .logo {
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: var(--primary);
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      align-items: center;
+      display: flex;
+      justify-content: center;
+    }
+
+    .logo i {
+      font-size: 2rem;
+    }
+
+    .card {
+      background-color: white;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      padding: 40px;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+      width: 100%;
+      max-width: 480px;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+    }
+
+    .card-header {
+      text-align: center;
+      margin-bottom: 10px;
+    }
+
+    .card-header h2 {
+      font-size: 1.5rem;
+      color: var(--dark);
+      font-weight: 600;
+      margin-bottom: 5px;
+    }
+
+    .card-header p {
+      color: var(--gray);
+      font-size: 0.9rem;
+    }
+
+    .input-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .input-group label {
+      font-size: 0.9rem;
+      color: var(--dark);
+      font-weight: 500;
+    }
+
+    .input-group input {
+      padding: 12px 16px;
+      border: 1px solid var(--gray-light);
+      border-radius: 8px;
+      font-size: 0.95rem;
+      transition: all 0.3s ease;
+    }
+
+    .input-group input:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.2);
+    }
+
+    .input-group input::placeholder {
+      color: var(--gray);
+    }
+
+    button {
+      background-color: var(--primary);
+      color: white;
+      border: none;
+      padding: 14px;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      margin-top: 10px;
+    }
+
+    button:hover {
+      background-color: var(--secondary);
+      transform: translateY(-2px);
+    }
+
+    button:active {
+      transform: translateY(0);
+    }
+
+    .footer-text {
+      margin-top: 20px;
+      color: var(--gray);
+      font-size: 0.85rem;
+      text-align: center;
+    }
+
+    @media (max-width: 600px) {
+      .card {
+        padding: 30px;
+      }
+      
+      .card-header h2 {
+        font-size: 1.3rem;
+      }
+    }
+  </style>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+  <div class="card" id="loginCard">
+    <div class="card-header">
+      <div class="logo">
+        <i class="fa-solid fa-file-invoice"></i>
+        <span>Invoizer</span>
+      </div>
+      <h2>Company Registration</h2>
+      <p>Enter your business details to get started</p>
+    </div>
+
+    <div class="input-group">
+      <label for="companyName">Company Name</label>
+      <input type="text" id="companyName" placeholder="e.g. Acme Corporation">
+    </div>
+
+    <div class="input-group">
+      <label for="ownerName">Owner/Representative Name</label>
+      <input type="text" id="ownerName" placeholder="e.g. John Doe">
+    </div>
+
+    <div class="input-group">
+      <label for="address">Business Address</label>
+      <input type="text" id="address" placeholder="123 Business St, City">
+    </div>
+
+    <div class="input-group">
+      <label for="email">Email Address</label>
+      <input type="email" id="email" placeholder="contact@company.com">
+    </div>
+
+    <div class="input-group">
+      <label for="gstin">GSTIN (Optional)</label>
+      <input type="text" id="gstin" placeholder="22AAAAA0000A1Z5">
+    </div>
+
+    <button onclick="saveCompany()">
+      <i class="fas fa-arrow-right"></i> Continue to Dashboard
+    </button>
+  </div>
+
+  <p class="footer-text">Securely stored in your browser • No data shared with servers</p>
+
+  <script>
+    function saveCompany() {
+      const company = {
+        name: document.getElementById('companyName').value,
+        owner: document.getElementById('ownerName').value,
+        address: document.getElementById('address').value,
+        email: document.getElementById('email').value,
+        gstin: document.getElementById('gstin').value
+      };
+      
+      // Simple validation
+      if (!company.name || !company.owner || !company.address || !company.email) {
+        alert("Please fill in all required fields");
+        return;
+      }
+      
+      localStorage.setItem('company', JSON.stringify(company));
+      
+      // Create a nice confirmation message
+      const button = document.querySelector('button');
+      button.innerHTML = '<i class="fas fa-check"></i> Success! Redirecting...';
+      button.style.backgroundColor = '#4bb543';
+      
+      setTimeout(() => {
+        // Redirect to invoice creation page
+        window.location.href = "home.html";
+      }, 1500);
+    }
+
+    // Add keyboard support (Enter key to submit)
+    document.addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') {
+        saveCompany();
+      }
+    });
+  </script>
+
+</body>
+</html>
