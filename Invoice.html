@@ -86,7 +86,8 @@
 
     .form-row {
       display: grid;
-      grid-template-columns: 2fr 1fr 1fr auto;
+      grid-template-columns: 1fr 1fr auto;
+      grid-template-rows: 1fr;
       gap: 15px;
       align-items: flex-end;
     }
@@ -233,11 +234,16 @@
       td:nth-of-type(2):before { content: "Description"; }
       td:nth-of-type(3):before { content: "Quantity"; }
       td:nth-of-type(4):before { content: "Unit Price"; }
-      td:nth-of-type(5):before { content: "Total"; }
-      td:nth-of-type(6):before { content: "Actions"; }
+      td:nth-of-type(5):before { content: "Serial No"; }
+      td:nth-of-type(6):before { content: "Total"; }
+      td:nth-of-type(7):before { content: "Actions"; }
       
       .remove-item {
         float: right;
+      }
+      
+      .form-row {
+        grid-template-columns: 1fr;
       }
     }
 
@@ -325,7 +331,7 @@
 
     .client-fields {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
+      grid-template-columns: repeat(2, 1fr);
       gap: 15px;
     }
 
@@ -363,7 +369,7 @@
         width: 100%;
       }
       
-      .form-row, .client-fields {
+      .client-fields {
         grid-template-columns: 1fr;
       }
       
@@ -412,6 +418,10 @@
           <input type="text" id="clientName" placeholder="Client or Company Name">
         </div>
         <div class="input-group">
+          <label for="clientAddress">Client Address</label>
+          <input type="text" id="clientAddress" placeholder="Hooghly,712704">
+        </div>
+        <div class="input-group">
           <label for="clientEmail">Email</label>
           <input type="email" id="clientEmail" placeholder="client@example.com">
         </div>
@@ -436,6 +446,10 @@
         <label for="itemPrice">Unit Price (₹)</label>
         <input type="number" id="itemPrice" placeholder="1000" min="0" step="0.01">
       </div>
+      <div class="input-group">
+        <label for="itemSlno">Item Serial Number</label>
+        <input type="text" id="itemSlno" placeholder="3456cdd789">
+      </div>
       <button onclick="addItem()">
         <i class="fas fa-plus"></i> Add Item
       </button>
@@ -446,23 +460,31 @@
       <thead>
         <tr>
           <th style="width: 5%">#</th>
-          <th style="width: 45%">Description</th>
+          <th style="width: 35%">Description</th>
           <th style="width: 10%">Qty</th>
           <th style="width: 15%">Unit Price</th>
+          <th style="width: 15%">Serial No</th>
           <th style="width: 15%">Total</th>
-          <th style="width: 10%"></th>
+          <th style="width: 5%"></th>
         </tr>
       </thead>
       <tbody></tbody>
     </table>
 
     <!-- Notes Section -->
-    <div class="notes-section">
-      <div class="input-group">
-        <label for="invoiceNotes">Notes</label>
-        <textarea id="invoiceNotes" placeholder="Payment terms, delivery information, or other notes..."></textarea>
-      </div>
-    </div>
+ <div class="notes-section">
+  <div class="input-group">
+    <label for="invoiceNotes">Notes</label>
+    <textarea id="invoiceNotes" placeholder="Payment terms, delivery information, or other notes...">
+1. Payments must be made only through A/C payee cheques.
+2. In case of cheque dishonor, a charge of two hundred will be applicable.
+3. All product warranties are provided solely by the respective manufacturers through their authorized service centers. We hold no legal or financial liability in this regard.
+4. Replacement of products under warranty will be processed only after we receive the replacement from the respective manufacturer/principal.
+
+Thank you.</textarea>
+  </div>
+</div>
+
 
     <!-- Taxes Section -->
     <div class="form-row">
@@ -474,6 +496,7 @@
         <label for="taxValue">Tax Rate (%)</label>
         <input type="number" id="taxValue" placeholder="18" min="0" max="100" step="0.1" value="18">
       </div>
+      <div></div>
       <div></div>
       <button onclick="addTax()">
         <i class="fas fa-plus"></i> Add Tax
@@ -511,314 +534,467 @@
 
   <script>
     // Initialize jsPDF
-const { jsPDF } = window.jspdf;
+    const { jsPDF } = window.jspdf;
 
-let items = [];
-let taxes = [{ name: "GST", value: 18 }]; // default GST tax
+    let items = [];
+    let taxes = [{ name: "GST", value: 18 }]; // default GST tax
 
-// Load company info from localStorage
-document.addEventListener('DOMContentLoaded', function() {
-  const company = JSON.parse(localStorage.getItem("company")) || {
-    name: "Your Company Name",
-    owner: "Proprietor Name",
-    address: "123 Business Street\nCity, State 123456",
-    gstin: "22AAAAA0000A1Z5",
-    email: "contact@yourcompany.com",
-    phone: "+91 9876543210",
-    bankDetails: "Bank Name: ABC Bank\nAccount No: 1234567890\nIFSC: ABCD0123456"
-  };
-  
-  document.getElementById("companyInfo").innerHTML = `
-    <strong>${company.name}</strong>
-    <p>${company.owner}</p>
-    <p>${company.address.replace(/\n/g, '<br>')}</p>
-    <p>GSTIN: ${company.gstin}</p>
-    <p>${company.email}</p>
-    <p>${company.phone}</p>
-  `;
-  
-  // Generate invoice number with better format: INV-YYYYMMDD-XXXX
-  if (!document.getElementById('invoiceNumber').value) {
-    const now = new Date();
-    const invNum = `INV-${now.getFullYear()}${(now.getMonth()+1).toString().padStart(2, '0')}${now.getDate().toString().padStart(2, '0')}-${Math.floor(1000 + Math.random() * 9000)}`;
-    document.getElementById('invoiceNumber').value = invNum;
-  }
+    // Load company info from localStorage
+    document.addEventListener('DOMContentLoaded', function() {
+      const company = JSON.parse(localStorage.getItem("company")) || {
+        name: "Your Company Name",
+        owner: "Proprietor Name",
+        address: "123 Business Street\nCity, State 123456",
+        gstin: "22AAAAA0000A1Z5",
+        email: "contact@yourcompany.com",
+        phone: "+91 9876543210",
+        bankDetails: "Bank Name: ABC Bank\nAccount No: 1234567890\nIFSC: ABCD0123456"
+      };
+      
+      document.getElementById("companyInfo").innerHTML = `
+        <strong>${company.name}</strong>
+        <p>${company.owner}</p>
+        <p>${company.address.replace(/\n/g, '<br>')}</p>
+        <p>GSTIN: ${company.gstin}</p>
+        <p>${company.email}</p>
+        <p>${company.phone}</p>
+      `;
+      
+      // Generate invoice number with better format: INV-YYYYMMDD-XXXX
+      if (!document.getElementById('invoiceNumber').value) {
+        const now = new Date();
+        const invNum = `INV-${now.getFullYear()}${(now.getMonth()+1).toString().padStart(2, '0')}${now.getDate().toString().padStart(2, '0')}-${Math.floor(1000 + Math.random() * 9000)}`;
+        document.getElementById('invoiceNumber').value = invNum;
+      }
+    });
+
+    // Add item to invoice
+    function addItem() {
+      const desc = document.getElementById('itemDesc').value.trim();
+      const qty = parseInt(document.getElementById('itemQty').value) || 1;
+      const price = parseFloat(document.getElementById('itemPrice').value);
+      const slNumber = document.getElementById("itemSlno").value || "N/A";
+
+      if (!desc || isNaN(price) || price <= 0) {
+        alert("Please enter valid item details");
+        return;
+      }
+
+      const item = { 
+        desc, 
+        qty, 
+        slNumber,
+        price, 
+        total: (qty * price).toFixed(2) 
+      };
+      items.push(item);
+      renderTable();
+      
+      // Clear inputs and focus
+      document.getElementById('itemDesc').value = "";
+      document.getElementById('itemQty').value = "1";
+      document.getElementById('itemPrice').value = "";
+      document.getElementById('itemSlno').value = "";
+      document.getElementById('itemDesc').focus();
+    }
+
+    // Render items table
+    function renderTable() {
+      const tbody = document.querySelector("#itemsTable tbody");
+      tbody.innerHTML = "";
+      let subtotal = 0;
+
+      items.forEach((item, index) => {
+        subtotal += parseFloat(item.total);
+        const row = document.createElement("tr");
+        
+        row.innerHTML = `
+          <td>${index + 1}</td>
+          <td>${item.desc}</td>
+          <td>${item.qty}</td>
+          <td>₹${parseFloat(item.price).toFixed(2)}</td>
+          <td>${item.slNumber}</td>
+          <td>₹${item.total}</td>
+          <td style="text-align: center;"><i class="fas fa-trash remove-item" onclick="removeItem(${index})" title="Remove item"></i></td>
+        `;
+        
+        tbody.appendChild(row);
+      });
+
+      calculateTotal(subtotal);
+    }
+
+    // Remove item from invoice
+    function removeItem(index) {
+      if (confirm("Remove this item?")) {
+        items.splice(index, 1);
+        renderTable();
+      }
+    }
+
+    // Add tax
+    function addTax() {
+      const name = document.getElementById("taxName").value.trim() || "GST";
+      const value = parseFloat(document.getElementById("taxValue").value) || 0;
+      
+      if (value <= 0 || value > 100) {
+        alert("Please enter valid tax rate (0-100)");
+        return;
+      }
+
+      taxes.push({ name, value });
+      document.getElementById("taxName").value = "";
+      document.getElementById("taxValue").value = "18";
+      renderTable();
+    }
+
+    // Calculate totals
+    function calculateTotal(subtotal) {
+      let taxTotal = 0;
+      let taxesHTML = "";
+
+      taxes.forEach((tax, index) => {
+        const taxAmount = (subtotal * tax.value) / 100;
+        taxTotal += taxAmount;
+        taxesHTML += `
+          <div class="totals-row">
+            <span>${tax.name} (${tax.value}%): 
+              <span class="remove-tax" onclick="removeTax(${index})" title="Remove tax">
+                <i class="fa-solid fa-trash"></i>
+              </span>
+            </span>
+            <span>₹${taxAmount.toFixed(2)}</span>
+          </div>
+        `;
+      });
+
+      const grandTotal = subtotal + taxTotal;
+
+      document.getElementById("subtotalAmount").innerText = "₹" + subtotal.toFixed(2);
+      document.getElementById("taxesContainer").innerHTML = taxesHTML;
+      document.getElementById("grandTotal").innerText = "₹" + grandTotal.toFixed(2);
+    }
+
+    // Remove tax
+    function removeTax(index) {
+      if (confirm("Remove this tax?")) {
+        taxes.splice(index, 1);
+        renderTable();
+      }
+    }
+
+    // Clear entire invoice
+    function clearInvoice() {
+      if (confirm("Are you sure you want to clear this invoice? All data will be lost.")) {
+        items = [];
+        taxes = [{ name: "GST", value: 18 }];
+        document.getElementById('clientName').value = "";
+        document.getElementById('clientAddress').value = "";
+        document.getElementById('clientEmail').value = "";
+        document.getElementById('clientPhone').value = "";
+        document.getElementById('invoiceNotes').value = "";
+        document.getElementById('itemSlno').value = "";
+        renderTable();
+      }
+    }
+
+    // Preview invoice
+    function previewInvoice() {
+      if (items.length === 0) {
+        alert("Please add at least one item to preview invoice");
+        return;
+      }
+      generatePDF(true);
+    }
+
+    // Download PDF
+    function downloadPDF() {
+      if (items.length === 0) {
+        alert("Please add at least one item to generate invoice");
+        return;
+      }
+      generatePDF(false);
+    }
+
+    // Function to convert numbers to words
+    function numberToWords(amount) {
+      const ones = ['', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine', 'Ten', 
+                   'Eleven', 'Twelve', 'Thirteen', 'Fourteen', 'Fifteen', 'Sixteen', 'Seventeen', 
+                   'Eighteen', 'Nineteen'];
+      const tens = ['', '', 'Twenty', 'Thirty', 'Forty', 'Fifty', 'Sixty', 'Seventy', 'Eighty', 'Ninety'];
+      
+      function convertLessThanThousand(num) {
+        if (num === 0) return '';
+        let result = '';
+        
+        if (num >= 100) {
+          result += ones[Math.floor(num / 100)] + ' Hundred ';
+          num %= 100;
+        }
+        
+        if (num >= 20) {
+          result += tens[Math.floor(num / 10)] + ' ';
+          num %= 10;
+        }
+        
+        if (num > 0) {
+          result += ones[num] + ' ';
+        }
+        
+        return result.trim();
+      }
+      
+      if (amount === 0) return 'Zero';
+      
+      let result = '';
+      const crore = Math.floor(amount / 10000000);
+      amount %= 10000000;
+      
+      const lakh = Math.floor(amount / 100000);
+      amount %= 100000;
+      
+      const thousand = Math.floor(amount / 1000);
+      amount %= 1000;
+      
+      const hundred = Math.floor(amount / 100);
+      amount %= 100;
+      
+      if (crore > 0) {
+        result += convertLessThanThousand(crore) + ' Crore ';
+      }
+      
+      if (lakh > 0) {
+        result += convertLessThanThousand(lakh) + ' Lakh ';
+      }
+      
+      if (thousand > 0) {
+        result += convertLessThanThousand(thousand) + ' Thousand ';
+      }
+      
+      if (hundred > 0) {
+        result += convertLessThanThousand(hundred) + ' Hundred ';
+      }
+      
+      if (amount > 0) {
+        result += convertLessThanThousand(amount);
+      }
+      
+      return result.trim() + ' Rupees Only';
+    }
+
+    // Generate PDF document
+    function generatePDF(previewMode = false) {
+      const company = JSON.parse(localStorage.getItem("company")) || {
+        name: "Your Company Name",
+        address: "123 Business Street, City, State 123456",
+        gstin: "22AAAAA0000A1Z5",
+        email: "contact@yourcompany.com",
+        phone: "+91 9876543210"
+      };
+
+      const invoiceNumber = document.getElementById('invoiceNumber').value || `INV-${new Date().toISOString().slice(0,10).replace(/-/g,'')}`;
+      const clientName = document.getElementById('clientName').value || "Client Name";
+      const clientAddress = document.getElementById('clientAddress').value || "Client Address";
+      const clientPhone = document.getElementById('clientPhone').value || "Phone Number";
+      const invoiceNotes = document.getElementById('invoiceNotes').value || "Thank you for your business!";
+      const invoiceDate = new Date().toLocaleDateString('en-IN', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      });
+
+      // Calculate totals
+      let subtotal = items.reduce((sum, i) => sum + parseFloat(i.total), 0);
+      let taxTotal = taxes.reduce((sum, t) => sum + (subtotal * t.value) / 100, 0);
+      let grandTotal = subtotal + taxTotal;
+      
+      // Convert amount to words
+      const amountInWords = numberToWords(Math.round(grandTotal));
+
+      const doc = new jsPDF({ unit: "mm", format: "a4" });
+      const pageWidth = doc.internal.pageSize.getWidth();
+      const pageHeight = doc.internal.pageSize.getHeight();
+      const margin = 15;
+      let yPos = margin;
+
+      // Add header with company info
+      doc.setFontSize(16);
+      doc.setFont(undefined, 'bold');
+      doc.text(company.name, margin, yPos);
+      yPos += 7;
+      
+      doc.setFontSize(10);
+      doc.setFont(undefined, 'normal');
+      const companyLines = doc.splitTextToSize(company.address, pageWidth - margin * 2);
+      companyLines.forEach(line => {
+        doc.text(line, margin, yPos);
+        yPos += 5;
+      });
+      
+      doc.text(`GSTIN: ${company.gstin}`, margin, yPos);
+      yPos += 5;
+      doc.text(`Phone: ${company.phone} | Email: ${company.email}`, margin, yPos);
+      yPos += 10;
+
+      // Draw a line separator
+      doc.setDrawColor(200, 200, 200);
+      doc.line(margin, yPos, pageWidth - margin, yPos);
+      yPos += 10;
+
+      // Add invoice title and details
+      doc.setFontSize(14);
+      doc.setFont(undefined, 'bold');
+      doc.text("TAX INVOICE", pageWidth - margin, yPos, { align: "right" });
+      yPos += 8;
+      
+      doc.setFontSize(10);
+      doc.setFont(undefined, 'normal');
+      doc.text(`Invoice No: ${invoiceNumber}`, pageWidth - margin, yPos, { align: "right" });
+      yPos += 5;
+      doc.text(`Date: ${invoiceDate}`, pageWidth - margin, yPos, { align: "right" });
+      yPos += 10;
+
+      // Add client information
+      doc.setFont(undefined, 'bold');
+      doc.text("Bill To:", margin, yPos);
+      yPos += 5;
+      
+      doc.setFont(undefined, 'normal');
+      doc.text(clientName, margin, yPos);
+      yPos += 5;
+      
+      const clientAddressLines = doc.splitTextToSize(clientAddress, pageWidth / 2);
+      clientAddressLines.forEach(line => {
+        doc.text(line, margin, yPos);
+        yPos += 5;
+      });
+      
+      doc.text(`Phone: ${clientPhone}`, margin, yPos);
+      yPos += 10;
+
+      // Draw a line separator
+      doc.line(margin, yPos, pageWidth - margin, yPos);
+      yPos += 10;
+
+      // Prepare table data
+      const tableColumn = ["Sr No", "Description", "Qty", "Unit Price", "Serial No", "Total"];
+      const tableRows = [];
+      
+      items.forEach((item, index) => {
+        const itemData = [
+          index + 1,
+          item.desc,
+          item.qty,
+          `₹${parseFloat(item.price).toFixed(2)}`,
+          item.slNumber,
+          `₹${parseFloat(item.total).toFixed(2)}`
+        ];
+        tableRows.push(itemData);
+      });
+
+      // Add items table
+      doc.autoTable({
+        startY: yPos,
+        head: [tableColumn],
+        body: tableRows,
+        theme: 'grid',
+        headStyles: {
+          fillColor: [37, 99, 235],
+          textColor: [255, 255, 255],
+          fontStyle: 'bold'
+        },
+        styles: {
+          fontSize: 9,
+          cellPadding: 3,
+          overflow: 'linebreak'
+        },
+        columnStyles: {
+          0: { cellWidth: 15 },
+          1: { cellWidth: 'auto' },
+          2: { cellWidth: 20 },
+          3: { cellWidth: 30 },
+          4: { cellWidth: 35 },
+          5: { cellWidth: 30 }
+        },
+        margin: { left: margin, right: margin }
+      });
+
+      yPos = doc.lastAutoTable.finalY + 10;
+
+      // Add totals section
+     // Column positions
+const labelX = pageWidth - margin - 80;  // left col
+const valueX = pageWidth - margin;       // right col
+
+// Subtotal
+doc.setFont(undefined, 'bold');
+doc.text("Subtotal:", labelX, yPos, { align: "right" });
+doc.text(`₹${subtotal.toFixed(2)}`, valueX, yPos, { align: "right" });
+yPos += 8;
+
+// Taxes (loop)
+doc.setFont(undefined, 'normal');
+taxes.forEach(tax => {
+  const taxAmount = (subtotal * tax.value) / 100;
+  doc.text(`${tax.name} (${tax.value}%):`, labelX, yPos, { align: "right" });
+  doc.text(`₹${taxAmount.toFixed(2)}`, valueX, yPos, { align: "right" });
+  yPos += 8;
 });
 
-// Add item to invoice
-function addItem() {
-  const desc = document.getElementById('itemDesc').value.trim();
-  const qty = parseInt(document.getElementById('itemQty').value) || 1;
-  const price = parseFloat(document.getElementById('itemPrice').value);
+// Divider line
 
-  if (!desc || isNaN(price) || price <= 0) {
-    alert("Please enter valid item details");
-    return;
-  }
+// Grand total (highlighted)
+doc.setFont(undefined, 'bold');
+doc.setFontSize(13);
+doc.text("Grand Total:", labelX, yPos, { align: "right" });
+doc.text(`₹${grandTotal.toFixed(2)}`, valueX, yPos, { align: "right" });
+yPos += 12;
 
-  const item = { 
-    desc, 
-    qty, 
-    price, 
-    total: (qty * price).toFixed(2) 
-  };
-  items.push(item);
-  renderTable();
-  
-  // Clear inputs and focus
-  document.getElementById('itemDesc').value = "";
-  document.getElementById('itemQty').value = "1";
-  document.getElementById('itemPrice').value = "";
-  document.getElementById('itemDesc').focus();
-}
+      // Add amount in words
+      doc.setFontSize(10);
+      doc.setFont(undefined, 'bold');
+      doc.text("Amount Chargeable (in words):", margin, yPos);
+      yPos += 5;
+      
+      doc.setFont(undefined, 'normal');
+      const wordsLines = doc.splitTextToSize(amountInWords, pageWidth - margin * 2);
+      wordsLines.forEach(line => {
+        doc.text(line, margin, yPos);
+        yPos += 5;
+      });
+      yPos += 5;
 
-// Render items table
-function renderTable() {
-  const tbody = document.querySelector("#itemsTable tbody");
-  tbody.innerHTML = "";
-  let subtotal = 0;
-
-  items.forEach((item, index) => {
-    subtotal += parseFloat(item.total);
-    const row = document.createElement("tr");
-    
-    row.innerHTML = `
-      <td>${index + 1}</td>
-      <td>${item.desc}</td>
-      <td>${item.qty}</td>
-      <td>₹${parseFloat(item.price).toFixed(2)}</td>
-      <td>₹${item.total}</td>
-      <td style="text-align: center;"><i class="fas fa-trash remove-item" onclick="removeItem(${index})" title="Remove item"></i></td>
-    `;
-    
-    tbody.appendChild(row);
-  });
-
-  calculateTotal(subtotal);
-}
-
-// Remove item from invoice
-function removeItem(index) {
-  if (confirm("Remove this item?")) {
-    items.splice(index, 1);
-    renderTable();
-  }
-}
-
-// Add tax
-function addTax() {
-  const name = document.getElementById("taxName").value.trim() || "GST";
-  const value = parseFloat(document.getElementById("taxValue").value) || 0;
-  
-  if (value <= 0 || value > 100) {
-    alert("Please enter valid tax rate (0-100)");
-    return;
-  }
-
-  taxes.push({ name, value });
-  document.getElementById("taxName").value = "";
-  document.getElementById("taxValue").value = "18";
-  renderTable();
-}
-
-// Calculate totals
-function calculateTotal(subtotal) {
-  let taxTotal = 0;
-  let taxesHTML = "";
-
-  taxes.forEach((tax, index) => {
-    const taxAmount = (subtotal * tax.value) / 100;
-    taxTotal += taxAmount;
-    taxesHTML += `
-      <div class="totals-row">
-        <span>${tax.name} (${tax.value}%): 
-          <span class="remove-tax" onclick="removeTax(${index})" title="Remove tax">
-            <i class="fa-solid fa-trash"></i>
-          </span>
-        </span>
-        <span>₹${taxAmount.toFixed(2)}</span>
-      </div>
-    `;
-  });
-
-  const grandTotal = subtotal + taxTotal;
-
-  document.getElementById("subtotalAmount").innerText = "₹" + subtotal.toFixed(2);
-  document.getElementById("taxesContainer").innerHTML = taxesHTML;
-  document.getElementById("grandTotal").innerText = "₹" + grandTotal.toFixed(2);
-}
-
-// Remove tax
-function removeTax(index) {
-  if (confirm("Remove this tax?")) {
-    taxes.splice(index, 1);
-    renderTable();
-  }
-}
-
-// Clear entire invoice
-function clearInvoice() {
-  if (confirm("Are you sure you want to clear this invoice? All data will be lost.")) {
-    items = [];
-    taxes = [{ name: "GST", value: 18 }];
-    document.getElementById('clientName').value = "";
-    document.getElementById('clientEmail').value = "";
-    document.getElementById('clientPhone').value = "";
-    document.getElementById('invoiceNotes').value = "";
-    renderTable();
-  }
-}
-
-// Preview invoice
-function previewInvoice() {
-  if (items.length === 0) {
-    alert("Please add at least one item to preview invoice");
-    return;
-  }
-  generatePDF(true);
-}
-
-// Download PDF
-function downloadPDF() {
-  if (items.length === 0) {
-    alert("Please add at least one item to generate invoice");
-    return;
-  }
-  generatePDF(false);
-}
-
-// Generate PDF document
-function generatePDF(previewMode = false) {
-  const company = JSON.parse(localStorage.getItem("company")) || {
-    name: "Koustab Chakraborty",
-    address: "Chanditala",
-    gstin: "6272010101-1-1",
-    email: "koustabchakraborty47@gmail.com",
-    phone: "Goldmed"
-  };
-
-  const clientName = document.getElementById('clientName').value || "Jaja Das";
-  const clientPhone = document.getElementById('clientPhone').value || "80020202020";
-  const invoiceNotes = document.getElementById('invoiceNotes').value || "All payments are cleared";
-
-  // Calculate totals
-  let subtotal = items.reduce((sum, i) => sum + parseFloat(i.total), 0);
-  let taxTotal = taxes.reduce((sum, t) => sum + (subtotal * t.value) / 100, 0);
-  let grandTotal = subtotal + taxTotal;
-
-  const doc = new jsPDF({ unit: "mm", format: "a4" });
-  const leftMargin = 15;
-  let yPos = 20;
-
-  // Main Invoice Table
-  const invoiceData = [
-    // Header Row
-    [
-      { 
-        content: "TAX INVOICE", 
-        styles: { 
-          fillColor: [40, 40, 40], 
-          textColor: [255, 255, 255], 
-          fontStyle: 'bold', 
-          halign: 'center' 
-        }, 
-        colSpan: 5 
+      // Add notes
+      if (invoiceNotes) {
+        doc.setFont(undefined, 'bold');
+        doc.text("Notes:", margin, yPos);
+        yPos += 5;
+        
+        doc.setFont(undefined, 'normal');
+        const notesLines = doc.splitTextToSize(invoiceNotes, pageWidth - margin * 2);
+        notesLines.forEach(line => {
+          doc.text(line, margin, yPos);
+          yPos += 5;
+        });
       }
-    ],
-    // Invoice Meta
-    [
-      { content: `Invoice #: INV-${new Date().toISOString().slice(0,10).replace(/-/g,'')}`, colSpan: 3 },
-      { content: `Date: ${new Date().toLocaleDateString('en-IN')}`, colSpan: 2, halign: 'right' }
-    ],
-    // Company & Client
-    [
-      { 
-        content: `From:\n${company.name}\n${company.address}\nGSTIN: ${company.gstin}\nPhone: ${company.phone}\nEmail: ${company.email}`, 
-        colSpan: 3, 
-        styles: { valign: 'top' } 
-      },
-      { 
-        content: `Bill To:\n${clientName}\nPhone: ${clientPhone}`, 
-        colSpan: 2, 
-        styles: { valign: 'top', halign: 'right' } 
-      }
-    ],
-    // Items Header
-    [
-      { content: "#", styles: { fillColor: [240, 240, 240], fontStyle: 'bold' } },
-      { content: "Description", styles: { fillColor: [240, 240, 240], fontStyle: 'bold' } },
-      { content: "Qty", styles: { fillColor: [240, 240, 240], fontStyle: 'bold', halign: 'center' } },
-      { content: "Unit Price", styles: { fillColor: [240, 240, 240], fontStyle: 'bold', halign: 'right' } },
-      { content: "Total", styles: { fillColor: [240, 240, 240], fontStyle: 'bold', halign: 'right' } }
-    ],
-    // Items
-    ...items.map((item, idx) => [
-      (idx + 1).toString(),
-      item.desc,
-      { content: item.qty.toString(), halign: 'center' },
-      { content: `₹${parseFloat(item.price).toFixed(2)}`, halign: 'right' },
-      { content: `₹${parseFloat(item.total).toFixed(2)}`, halign: 'right' }
-    ]),
-    // Subtotal
-    [
-      { content: "Subtotal:", colSpan: 4, halign: 'right', styles: { fontStyle: 'bold' } },
-      { content: `₹${subtotal.toFixed(2)}`, halign: 'right' }
-    ],
-    // Taxes
-    ...taxes.map(tax => [
-      { content: `${tax.name} (${tax.value}%):`, colSpan: 4, halign: 'right' },
-      { content: `₹${((subtotal * tax.value) / 100).toFixed(2)}`, halign: 'right' }
-    ]),
-    // Grand Total
-    [
-      { content: "Grand Total:", colSpan: 4, halign: 'right', styles: { fontStyle: 'bold', textColor: [255, 255, 255], fillColor: [40, 40, 40] } },
-      { content: `₹${grandTotal.toFixed(2)}`, halign: 'right', styles: { fontStyle: 'semi-bold',fontSize:10 , textColor: [255, 255, 255], fillColor: [40, 40, 40] } }
-    ],
-    // Notes
-    [
-      { content: `Notes: ${invoiceNotes} , all prices are in INR `, colSpan: 5, styles: { fontStyle: 'italic' } }
-    ],
-    // Footer
-    [
-      { content: "Thank you", colSpan: 5, halign: 'center', styles: { fontSize: 9, textColor: [100, 100, 100] } }
-    ]
-  ];
 
-  // Generate the table
-  doc.autoTable({
-    startY: yPos,
-    head: [invoiceData[0]], // Header row
-    body: invoiceData.slice(1), // Rest of the content
-    margin: { left: leftMargin, right: leftMargin },
-    styles: {
-      fontSize: 10,
-      cellPadding: 3,
-      overflow: 'linebreak',
-      lineColor: [200, 200, 200],
-      lineWidth: 0.2
-    },
-    columnStyles: {
-      0: { cellWidth: 10 },
-      1: { cellWidth: 'auto' },
-      2: { cellWidth: 15 },
-      3: { cellWidth: 25 },
-      4: { cellWidth: 25 }
-    },
-    didDrawPage: () => {
-      // Footer on every page
+      // Add footer
+      const footerY = pageHeight - margin - 20;
+      doc.setDrawColor(200, 200, 200);
+      doc.line(margin, footerY, pageWidth - margin, footerY);
+      
       doc.setFontSize(8);
-      doc.setTextColor(150, 150, 150);
-      doc.text("Computer generated invoice - No signature required", 105, 287, { align: "center" });
-    }
-  });
+      doc.setTextColor(100, 100, 100);
+      doc.text("This is a computer generated invoice. No signature is required.", pageWidth / 2, footerY + 5, { align: "center" });
+      doc.text("Thank you for your business!", pageWidth / 2, footerY + 10, { align: "center" });
 
-  // Output
-  if (previewMode) {
-    window.open(doc.output('datauristring'));
-  } else {
-    doc.save(`invoice_${new Date().toISOString().slice(0,10)}.pdf`);
-  }
-}
+      // Output
+      if (previewMode) {
+        window.open(doc.output('datauristring'));
+      } else {
+        doc.save(`Invoice_${invoiceNumber}.pdf`);
+      }
+    }
   </script>
 </body>
 </html>
