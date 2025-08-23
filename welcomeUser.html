@@ -199,8 +199,8 @@
     </div>
 
     <div class="input-group">
-      <label for="gstin">GSTIN (Optional)</label>
-      <input type="text" id="gstin" placeholder="22AAAAA0000A1Z5">
+      <label for="number">Phone Number</label>
+      <input type="number" id="number" placeholder="+91 7890456789">
     </div>
 
     <button onclick="saveCompany()">
@@ -217,7 +217,7 @@
         owner: document.getElementById('ownerName').value,
         address: document.getElementById('address').value,
         email: document.getElementById('email').value,
-        gstin: document.getElementById('gstin').value
+        number: document.getElementById('number').value
       };
       
       // Simple validation
