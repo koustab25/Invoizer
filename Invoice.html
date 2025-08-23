@@ -450,6 +450,10 @@
         <label for="itemSlno">Item Serial Number</label>
         <input type="text" id="itemSlno" placeholder="3456cdd789">
       </div>
+      <div class="input-group">
+        <label for="datePurchase">Date Of Purchase</label>
+        <input type="date" id="datePurchase" placeholder="27/08/2024">
+      </div>
       <button onclick="addItem()">
         <i class="fas fa-plus"></i> Add Item
       </button>
@@ -462,6 +466,7 @@
           <th style="width: 5%">#</th>
           <th style="width: 35%">Description</th>
           <th style="width: 10%">Qty</th>
+          <th style="width: 10%">date</th>
           <th style="width: 15%">Unit Price</th>
           <th style="width: 15%">Serial No</th>
           <th style="width: 15%">Total</th>
@@ -481,7 +486,7 @@
 3. All product warranties are provided solely by the respective manufacturers through their authorized service centers. We hold no legal or financial liability in this regard.
 4. Replacement of products under warranty will be processed only after we receive the replacement from the respective manufacturer/principal.
 
-Thank you.</textarea>
+</textarea>
   </div>
 </div>
 
@@ -845,11 +850,13 @@ Thank you.</textarea>
       doc.text("TAX INVOICE", pageWidth - margin, yPos, { align: "right" });
       yPos += 8;
       
+      var dateOfPurchase = document.getElementById('datePurchase').value;
+
       doc.setFontSize(10);
       doc.setFont(undefined, 'normal');
       doc.text(`Invoice No: ${invoiceNumber}`, pageWidth - margin, yPos, { align: "right" });
       yPos += 5;
-      doc.text(`Date: ${invoiceDate}`, pageWidth - margin, yPos, { align: "right" });
+      doc.text(`Date: ${dateOfPurchase}`, pageWidth - margin, yPos, { align: "right" });
       yPos += 10;
 
       // Add client information
