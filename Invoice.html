@@ -545,7 +545,7 @@ Thank you.</textarea>
         name: "Your Company Name",
         owner: "Proprietor Name",
         address: "123 Business Street\nCity, State 123456",
-        gstin: "22AAAAA0000A1Z5",
+        number: "+91 7890564783",
         email: "contact@yourcompany.com",
         phone: "+91 9876543210",
         bankDetails: "Bank Name: ABC Bank\nAccount No: 1234567890\nIFSC: ABCD0123456"
@@ -555,9 +555,8 @@ Thank you.</textarea>
         <strong>${company.name}</strong>
         <p>${company.owner}</p>
         <p>${company.address.replace(/\n/g, '<br>')}</p>
-        <p>GSTIN: ${company.gstin}</p>
+        <p>${company.number}</p>
         <p>${company.email}</p>
-        <p>${company.phone}</p>
       `;
       
       // Generate invoice number with better format: INV-YYYYMMDD-XXXX
@@ -787,7 +786,6 @@ Thank you.</textarea>
       const company = JSON.parse(localStorage.getItem("company")) || {
         name: "Your Company Name",
         address: "123 Business Street, City, State 123456",
-        gstin: "22AAAAA0000A1Z5",
         email: "contact@yourcompany.com",
         phone: "+91 9876543210"
       };
@@ -831,9 +829,9 @@ Thank you.</textarea>
         yPos += 5;
       });
       
-      doc.text(`GSTIN: ${company.gstin}`, margin, yPos);
+      doc.text(`Phone Number: ${company.number}`, margin, yPos);
       yPos += 5;
-      doc.text(`Phone: ${company.phone} | Email: ${company.email}`, margin, yPos);
+      doc.text(`Email: ${company.email}`, margin, yPos);
       yPos += 10;
 
       // Draw a line separator
